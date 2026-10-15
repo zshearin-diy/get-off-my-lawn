@@ -1,0 +1,18 @@
+# Intel macOS (x86_64): PyTorch's last published macOS x86_64 wheel is 2.2.2,
+# which supports Python <= 3.12 and is compiled against NumPy 1.x.
+torch==2.2.2; sys_platform == "darwin" and platform_machine == "x86_64"
+torchvision==0.17.2; sys_platform == "darwin" and platform_machine == "x86_64"
+numpy<2; sys_platform == "darwin" and platform_machine == "x86_64"
+opencv-python<4.11; sys_platform == "darwin" and platform_machine == "x86_64"
+
+# Apple Silicon, Linux, Windows: current wheels, NumPy 2.x is fine.
+torch>=2.4; sys_platform != "darwin" or platform_machine != "x86_64"
+torchvision>=0.19; sys_platform != "darwin" or platform_machine != "x86_64"
+numpy>=2; sys_platform != "darwin" or platform_machine != "x86_64"
+opencv-python>=4.11; sys_platform != "darwin" or platform_machine != "x86_64"
+
+# 8.4.x ships the yolo26 model configs used by main.py
+ultralytics>=8.4.177
+
+# Prebuilt ffmpeg binary, used to stream the USB camera (see README).
+imageio-ffmpeg>=0.5
