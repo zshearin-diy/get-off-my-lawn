@@ -56,6 +56,38 @@ this is almost always why.
 - Model weights (`yolo11n.pt`) download automatically on first use and are
   gitignored — no need to commit them.
 
+## Pan/tilt control
+
+The camera is mounted on the pan/tilt rig, so a detection's offset from the
+centre of frame *is* the error signal: the rig steers until the target is
+centred, then `fire()` sends the separate signal. Each update moves a fraction
+(`GAIN`) of the remaining error, so corrections converge over a few frames
+instead of overshooting.
+
+`send_angles()` emits **absolute** angles plus the delta. Absolute is the source
+of truth -- servos are position devices, and sending only deltas lets a dropped
+command become permanent drift -- while the delta is there for a stepper or
+continuous-rotation servo.
+
+Three things need calibrating on the real hardware:
+
+- `FOV_PAN_DEG` / `FOV_TILT_DEG` -- the camera's field of view. Centre something
+  in frame, pan until it sits at the frame edge, double the angle travelled.
+- `PAN_SIGN` / `TILT_SIGN` -- flip to `-1` if the rig steers *away* from the
+  target. Which sign is correct depends on how the servos are mounted.
+- `GAIN` -- raise for faster convergence, lower if the rig oscillates around
+  centre. Start at 0.6.
+
+`DEADZONE` is what stops the rig hunting forever: inside it the target counts as
+centred, so a small residual offset (a couple of degrees) is expected and
+desirable. `MAX_STEP` caps degrees per update so a single bad detection cannot
+slam the servos.
+
+Only one target is chased at a time. `pick_target()` locks onto the largest
+(nearest) box and keeps it, tolerating `LOST_FRAMES` of dropout before
+re-locking -- without that the rig oscillates between two people instead of
+centring either.
+
 ## Platform notes
 
 Dependencies are platform-sensitive, so `requirements.txt` uses environment
