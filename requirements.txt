@@ -13,6 +13,3 @@ opencv-python>=4.11; sys_platform != "darwin" or platform_machine != "x86_64"
 
 # 8.4.x ships the yolo26 model configs used by main.py
 ultralytics>=8.4.177
-
-# Prebuilt ffmpeg binary, used to stream the USB camera (see README).
-imageio-ffmpeg>=0.5

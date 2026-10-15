@@ -45,48 +45,16 @@ this is almost always why.
 
 - On first run macOS prompts for camera access for your terminal app. Grant it,
   or the capture device will fail to open.
-- **Camera.** `SOURCE` at the top of `main.py` selects the input. Default
-  `"usb"` streams the USB camera through ffmpeg; pass a cv2 index instead to use
-  a camera directly:
-
-  ```sh
-  python main.py          # USB camera, via ffmpeg stream
-  python main.py 1        # built-in FaceTime camera, direct
-  ```
-
-  The USB camera's AVFoundation index is resolved by name at runtime, because it
-  changes between replugs -- it has been observed at both 0 and 1 within a single
-  session, so hardcoding it is unreliable.
+- **Camera.** `CAMERA_INDEX` at the top of `main.py`, or override per-run:
+  `python main.py 0`. On this Mac index 1 is the built-in FaceTime camera. The
+  USB camera (320x240 @ 15fps only) cannot be opened by `cv2` on macOS at all --
+  its AVFoundation backend requests a higher resolution and framerate than the
+  device offers, and every index, backend, explicit format and opencv-python
+  version from 4.8 to 4.10 fails identically. On Linux it goes through V4L2
+  instead, where it is expected to work normally.
 - `save=True` in `main.py` writes annotated video to `runs/` (gitignored).
 - Model weights (`yolo11n.pt`) download automatically on first use and are
   gitignored — no need to commit them.
-
-## Why the USB camera needs ffmpeg
-
-`cv2.VideoCapture` cannot open the USB camera at all, failing with
-`VIDEOIO(AVFOUNDATION): raised unknown C++ exception!`. The camera offers only
-320x240 and 160x120, both at 15fps, while OpenCV's AVFoundation backend requests
-a higher resolution and ~30fps. Verified dead ends:
-
-- Every index and backend pair (`CAP_AVFOUNDATION`, `CAP_ANY`).
-- Explicit MJPG/YUY2 formats at 320x240 and 160x120, set before and at open time.
-- opencv-python 4.10, 4.9 and 4.8 -- identical exception from each.
-
-The camera is healthy: AVFoundation reports it connected and captures ~15fps
-from it directly, and it works in Google Meet.
-
-The fix relies on OpenCV being built with `FFMPEG: YES`, so while it cannot open
-the *device*, it reads a *network stream* without trouble. `main.py` has ffmpeg
-capture the camera and publish it to `tcp://127.0.0.1:5000`, then hands that URL
-to YOLO. Ultralytics treats `tcp://` as a stream (`udp://` is rejected as a file
-path), so its own capture loop drives playback -- the same smooth path the
-built-in camera uses. Feeding frames in one at a time instead makes the display
-pulse and stutter, because each `model.track()` call resets the window.
-
-The ffmpeg binary comes from the `imageio-ffmpeg` pip wheel. Homebrew cannot
-supply it here: it no longer builds Intel x86_64 bottles, so `brew install
-ffmpeg` compiles from source, which this machine's Command Line Tools cannot do
-(they predate macOS 26).
 
 ## Platform notes
 
