@@ -1,3 +1,6 @@
+import os
+import shutil
+import subprocess
 import sys
 import time
 
@@ -26,6 +29,8 @@ DEADZONE = 0.05          # |error| under this counts as centred
 CENTERED_FRAMES = 3      # consecutive centred frames before firing
 COOLDOWN_SECONDS = 10    # minimum gap between firings
 LOST_FRAMES = 10         # frames without the locked target before re-locking
+
+SOUND_FILE = "alert.wav"  # played on firing; WAV so the Pi can use aplay directly
 
 VERBOSE = False          # print every tracked detection, not just rig activity
 
@@ -59,9 +64,30 @@ def send_angles(pan, tilt, pan_delta, tilt_delta):
     )
 
 
+def play_sound():
+    """Start the alert sound without waiting for it to finish.
+
+    Popen, not run(): blocking here would stall detection for the length of the
+    clip. macOS ships afplay; Linux and the Pi use aplay, which plays WAV with
+    no extra packages. A missing file or player is a warning, not a crash --
+    losing audio should not take the rig down.
+    """
+    player = "afplay" if sys.platform == "darwin" else "aplay"
+    if not os.path.exists(SOUND_FILE):
+        print(f"[sound]   {SOUND_FILE} not found, skipping")
+        return
+    if shutil.which(player) is None:
+        print(f"[sound]   {player} not installed, skipping")
+        return
+    subprocess.Popen(
+        [player, SOUND_FILE], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+
+
 def fire():
     """The 'other signal' -- sent once the target is centred and settled."""
     print("[fire]    target centred")
+    play_sound()
 
 
 def steer(error_x, error_y):

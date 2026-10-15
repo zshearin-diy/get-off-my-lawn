@@ -88,6 +88,21 @@ Only one target is chased at a time. `pick_target()` locks onto the largest
 re-locking -- without that the rig oscillates between two people instead of
 centring either.
 
+## Sound
+
+`fire()` calls `play_sound()`, which shells out to the OS player -- `afplay` on
+macOS, `aplay` on Linux and the Pi -- via `Popen` so playback does not block
+detection. `SOUND_FILE` is a WAV deliberately: `aplay` plays it with no extra
+packages, where mp3 would need `mpg123` or similar installed.
+
+`alert.wav` in the repo is a generated 0.3s chirp, there so this is testable
+before you pick a real sound. Replace it with any mono/stereo 16-bit WAV.
+
+A missing file or missing player prints a warning and continues rather than
+raising -- losing audio should not stop the rig. Overlapping playback is not a
+concern because `COOLDOWN_SECONDS` already spaces firings further apart than any
+sensible clip.
+
 ## Platform notes
 
 Dependencies are platform-sensitive, so `requirements.txt` uses environment
