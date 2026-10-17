@@ -13,3 +13,7 @@ opencv-python>=4.11; sys_platform != "darwin" or platform_machine != "x86_64"
 
 # 8.4.x ships the yolo26 model configs used by main.py
 ultralytics>=8.4.177
+
+# Talks to the servo board over USB serial; optional -- without it main.py
+# prints angles instead of sending them.
+pyserial>=3.5

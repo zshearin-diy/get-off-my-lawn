@@ -103,6 +103,42 @@ raising -- losing audio should not stop the rig. Overlapping playback is not a
 concern because `COOLDOWN_SECONDS` already spaces firings further apart than any
 sensible clip.
 
+## Servo hardware
+
+The Mac (or Pi) runs vision and sends angles; a microcontroller turns them into
+PWM. A Pi *can* drive servos from its own GPIO, but its general-purpose PWM is
+software-timed and jitters under exactly the load a neural net creates, so a
+separate board is the more reliable arrangement.
+
+```
+host (YOLO)  --USB serial-->  Arduino  --PWM-->  pan + tilt servos
+             "P090T090\n"      Servo.h
+```
+
+Flash `arduino/pan_tilt/pan_tilt.ino`. It reads one absolute command per line
+and replies `ok <pan> <tilt>`. **[HARDWARE.md](HARDWARE.md) has step-by-step
+setup instructions** written for someone new to Arduino; the two rules that
+cause the most grief:
+
+- **Power servos from an external 5V supply**, not the board's 5V pin. Stall
+  current browns the board out and resets it mid-run.
+- **Common ground.** Servo ground must reach both the supply ground and a board
+  GND pin, or the signal has no reference and the servos jitter.
+
+`main.py` autodetects the port (`usbmodem`/`usbserial`/`ttyACM`/`ttyUSB`), or set
+`SERIAL_PORT` to pin it. With no board, no port, or no `pyserial`, it prints
+angles and keeps running -- so the vision half stays testable on its own.
+
+Bring it up in this order, so a failure has one possible cause:
+
+1. Flash the sketch and confirm the servos centre on power-up.
+2. Open the Arduino serial monitor at 115200 and type `P120T060` by hand. The
+   servos should move and the board should answer `ok 120 60`.
+3. Run `python main.py` and watch for `[board] connected on ...`.
+
+If the rig steers *away* from the target and runs to its limit, flip `PAN_SIGN`
+or `TILT_SIGN` -- that is what a mirrored mount looks like.
+
 ## Platform notes
 
 Dependencies are platform-sensitive, so `requirements.txt` uses environment
