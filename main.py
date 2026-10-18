@@ -4,6 +4,12 @@ import subprocess
 import sys
 import time
 
+try:
+    import serial
+    from serial.tools import list_ports
+except ImportError:  # the loop still runs (and prints) without a board attached
+    serial = None
+
 from ultralytics import YOLO
 
 # cv2 camera index. On this Mac, 1 is the built-in FaceTime camera; on Linux
@@ -32,6 +38,9 @@ LOST_FRAMES = 10         # frames without the locked target before re-locking
 
 SOUND_FILE = "alert.wav"  # played on firing; WAV so the Pi can use aplay directly
 
+SERIAL_PORT = None       # None autodetects; set e.g. "/dev/cu.usbmodem1101" to pin it
+BAUD = 115200            # must match Serial.begin() in arduino/pan_tilt/pan_tilt.ino
+
 VERBOSE = False          # print every tracked detection, not just rig activity
 
 rig = {
@@ -49,19 +58,54 @@ def clamp(value, limits):
     return min(max(value, low), high)
 
 
+def find_port():
+    """First USB serial port that looks like a microcontroller."""
+    if SERIAL_PORT:
+        return SERIAL_PORT
+    for port in list_ports.comports():
+        if any(tag in port.device for tag in ("usbmodem", "usbserial", "ttyACM", "ttyUSB")):
+            return port.device
+    return None
+
+
+def open_board():
+    """Connect to the servo board, or return None to run in print-only mode.
+
+    Opening the port resets an Arduino, so wait before sending: commands written
+    during the bootloader window are discarded.
+    """
+    if serial is None:
+        print("[board]   pyserial not installed, printing angles only")
+        return None
+    port = find_port()
+    if port is None:
+        print("[board]   no serial port found, printing angles only")
+        return None
+    try:
+        board = serial.Serial(port, BAUD, timeout=1)
+    except OSError as error:
+        print(f"[board]   cannot open {port} ({error}), printing angles only")
+        return None
+    time.sleep(2)  # let the board finish resetting
+    print(f"[board]   connected on {port}")
+    return board
+
+
 def send_angles(pan, tilt, pan_delta, tilt_delta):
     """Where the servo command goes once a board is wired up.
 
     Absolute angles are the source of truth -- servos are position devices, and
     sending only deltas lets a dropped command become permanent drift. The
     deltas are supplied too, since that is what a stepper or continuous-rotation
-    servo would want. Replace the print with a serial write, e.g.
-        board.write(f"P{pan:03d}T{tilt:03d}\\n".encode())
+    servo would want. The wire format matches the sketch in
+    arduino/pan_tilt/pan_tilt.ino: "P090T090\\n".
     """
     print(
         f"[rig]     pan {pan:3d} ({pan_delta:+.1f})  "
         f"tilt {tilt:3d} ({tilt_delta:+.1f})"
     )
+    if board is not None:
+        board.write(f"P{pan:03d}T{tilt:03d}\n".encode())
 
 
 def play_sound():
@@ -154,6 +198,8 @@ def evaluate(targets, now):
     print(f"[centred] id {object_id} at ({center_x:.3f}, {center_y:.3f})")
     fire()
 
+
+board = open_board()
 
 camera = int(sys.argv[1]) if len(sys.argv) > 1 else CAMERA_INDEX
 
