@@ -1,8 +1,7 @@
-import os
-import shutil
-import subprocess
 import sys
 import time
+
+import cv2
 
 try:
     import serial
@@ -15,6 +14,11 @@ from ultralytics import YOLO
 # cv2 camera index. On this Mac, 1 is the built-in FaceTime camera; on Linux
 # (the Pi) the attached camera is normally 0. Override: `python main.py 0`
 CAMERA_INDEX = 1
+
+# cv2.flip code applied to every frame before detection, so the steering maths
+# sees an upright image: -1 rotates 180 (camera mounted upside down), 0 flips
+# vertically, 1 mirrors left-right, None leaves frames untouched.
+FLIP = -1
 
 TARGET_CLASSES = {"person"}
 MIN_CONFIDENCE = 0.5     # weak detections are the main false-trigger source
@@ -35,8 +39,6 @@ DEADZONE = 0.05          # |error| under this counts as centred
 CENTERED_FRAMES = 3      # consecutive centred frames before firing
 COOLDOWN_SECONDS = 10    # minimum gap between firings
 LOST_FRAMES = 10         # frames without the locked target before re-locking
-
-SOUND_FILE = "alert.wav"  # played on firing; WAV so the Pi can use aplay directly
 
 SERIAL_PORT = None       # None autodetects; set e.g. "/dev/cu.usbmodem1101" to pin it
 BAUD = 115200            # must match Serial.begin() in arduino/pan_tilt/pan_tilt.ino
@@ -108,30 +110,18 @@ def send_angles(pan, tilt, pan_delta, tilt_delta):
         board.write(f"P{pan:03d}T{tilt:03d}\n".encode())
 
 
-def play_sound():
-    """Start the alert sound without waiting for it to finish.
-
-    Popen, not run(): blocking here would stall detection for the length of the
-    clip. macOS ships afplay; Linux and the Pi use aplay, which plays WAV with
-    no extra packages. A missing file or player is a warning, not a crash --
-    losing audio should not take the rig down.
-    """
-    player = "afplay" if sys.platform == "darwin" else "aplay"
-    if not os.path.exists(SOUND_FILE):
-        print(f"[sound]   {SOUND_FILE} not found, skipping")
-        return
-    if shutil.which(player) is None:
-        print(f"[sound]   {player} not installed, skipping")
-        return
-    subprocess.Popen(
-        [player, SOUND_FILE], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-    )
-
-
 def fire():
-    """The 'other signal' -- sent once the target is centred and settled."""
+    """Pulse the solenoid, once the target is centred and settled.
+
+    The board owns the pulse length: sending "F" asks for one shot and the
+    sketch releases it on its own. Holding a solenoid on from here would mean a
+    crash or an unplugged cable leaves it energised, which overheats the coil.
+    """
     print("[fire]    target centred")
-    play_sound()
+    if board is None:
+        print("[fire]    no board, solenoid not fired")
+        return
+    board.write(b"F\n")
 
 
 def steer(error_x, error_y):
@@ -212,10 +202,41 @@ target_ids = sorted(i for i, name in model.names.items() if name in TARGET_CLASS
 if not target_ids:
     raise SystemExit(f"No such classes in this model: {sorted(TARGET_CLASSES)}")
 
-results = model.track(
-    source=camera, classes=target_ids, show=True, stream=True, save=True
-)
-for r in results:
+
+def frames(capture):
+    """Camera frames, flipped upright.
+
+    The camera is read here rather than handed to model.track as a source, so
+    each frame can be flipped before the model sees it.
+    """
+    while True:
+        ok, frame = capture.read()
+        if not ok:
+            return
+        yield frame if FLIP is None else cv2.flip(frame, FLIP)
+
+
+capture = cv2.VideoCapture(camera)
+if not capture.isOpened():
+    raise SystemExit(f"Cannot open camera {camera}")
+
+writer = None  # created on the first frame, once its size is known
+for frame in frames(capture):
+    # persist=True keeps tracker IDs across calls now that frames arrive one at a time
+    r = model.track(frame, classes=target_ids, persist=True, verbose=False)[0]
+
+    annotated = r.plot()
+    cv2.imshow("get-off-my-lawn", annotated)
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
+    if writer is None:
+        height, width = annotated.shape[:2]
+        fps = capture.get(cv2.CAP_PROP_FPS) or 30
+        writer = cv2.VideoWriter(
+            "runs/track.mp4", cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height)
+        )
+    writer.write(annotated)
+
     names = r.names
     boxes = r.boxes
     name_to_position_map = {}
@@ -241,3 +262,8 @@ for r in results:
             print(f"center.y: {float(value[1]):.3f}")
             print(f"width:    {float(value[2]):.3f}")
             print(f"height:   {float(value[3]):.3f}")
+
+capture.release()
+if writer is not None:
+    writer.release()
+cv2.destroyAllWindows()

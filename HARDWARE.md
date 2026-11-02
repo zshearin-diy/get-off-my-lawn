@@ -16,8 +16,12 @@ The sketch lives in [`arduino/pan_tilt/pan_tilt.ino`](arduino/pan_tilt/pan_tilt.
 | USB cable | Uno uses USB-B (printer cable), Nano usually mini- or micro-USB. Must be a **data** cable, not charge-only. |
 | 2 servos | SG90 for bench testing; MG996R or similar for anything that moves a real load. |
 | 5V power supply | **Separate from the Arduino.** 2A minimum for two SG90s, 4A+ for two MG996Rs. |
-| Breadboard + jumper wires | Needed to join three grounds together. |
+| Breadboard + jumper wires | Needed to join every ground together. |
 | Pan/tilt bracket | Optional, but the two servos must be mechanically coupled somehow. |
+| Solenoid | Whatever it drives — a valve, a striker. Note its voltage and current. |
+| Logic-level N-channel MOSFET | IRLZ44N or similar. A relay module works too and is easier to wire. |
+| Flyback diode | 1N4007 or similar, across the coil. Not optional — see Stage 4b. |
+| Solenoid power supply | Matched to the coil, often 12V. Can be the 5V supply if the coil is 5V. |
 
 ### Why a separate power supply
 
@@ -70,12 +74,13 @@ This proves the board works before Python is anywhere near it.
 3. Set the line ending dropdown to **New Line**. ← *Easy to miss.* The sketch
    waits for a newline character to know a command has ended. With "No Line
    Ending" selected, nothing you type will ever do anything.
-4. Type `P120T060` and press Enter.
+4. Type `P120T060` and press Enter, then type `F` and press Enter.
 
 The board should reply:
 
 ```
 ok 120 60
+ok fire
 ```
 
 **Checkpoint:** you get `ok` back. If you do, the board, cable, port, baud rate
@@ -118,6 +123,39 @@ there doing nothing. Symptoms look exactly like a broken servo.
 
 ---
 
+## Stage 4b — Wire the solenoid
+
+A solenoid is a coil, and that makes it two kinds of dangerous to a circuit.
+
+**It draws far more current than a pin can supply.** An Arduino pin sources
+about 20mA; a solenoid wants hundreds of milliamps or more. Pin 7 therefore
+drives a *switch* — a logic-level MOSFET's gate, or a relay module's input — and
+that switch passes the real current from the solenoid's own supply.
+
+**Switching a coil off produces a large reverse voltage spike.** The collapsing
+magnetic field has to put its energy somewhere, and without a path it arcs
+through whatever just switched it off. A **flyback diode** across the coil gives
+that current a loop to die in. Fit it with the banded end (cathode) toward the
+supply's **+** terminal — backwards, it short-circuits the supply.
+
+Connections:
+
+- **Pin 7 → MOSFET gate** (or relay `IN`).
+- **MOSFET drain → one coil terminal**; **coil's other terminal → supply +**.
+- **MOSFET source → the shared GND rail.**
+- **Solenoid supply − → the shared GND rail**, same as everything else.
+- **Flyback diode across the coil**, band toward +.
+
+A relay module is the easier path if this is unfamiliar: it takes `IN`, `VCC`
+and `GND`, usually has the diode built in, and switches the coil circuit for
+you. It is slower and noisier than a MOSFET, which does not matter here.
+
+> **If you are using a 12V solenoid supply**, double-check nothing but ground
+> connects it to the Arduino. The only shared conductor between the two
+> supplies and the board is the ground rail.
+
+---
+
 ## Stage 5 — Power up and retest by hand
 
 1. Plug in the external 5V supply. Both servos should jump to centre (90°),
@@ -125,8 +163,15 @@ there doing nothing. Symptoms look exactly like a broken servo.
 2. Plug in USB.
 3. Open the Serial Monitor again (115200, **New Line**).
 4. Type `P120T060` and press Enter.
+5. Type `F` and press Enter.
 
-Both servos should move, and you should see `ok 120 60`.
+Both servos should move (`ok 120 60`), and the solenoid should click for about
+400ms and release on its own (`ok fire`).
+
+> **If the solenoid stays energised**, stop and unplug it. The board releases it
+> on a timer, so a stuck coil means the MOSFET is wired wrong — most often the
+> gate and drain swapped, or a non-logic-level MOSFET that will not fully switch
+> at 5V.
 
 **Checkpoint:** servos move on command. The hardware is now fully proven.
 
@@ -217,5 +262,9 @@ it creeps toward the target too slowly.
 | Board resets when servos move | Servos powered from the Arduino instead of the external supply |
 | `no serial port found` | Serial Monitor still holding the port, or cable not connected |
 | Rig runs to its limit instead of settling | `PAN_SIGN` / `TILT_SIGN` wrong for your mounting |
+| Solenoid never fires | Pin 7 not connected to the gate, or a non-logic-level MOSFET |
+| Solenoid fires but stays on | Gate/drain swapped, or MOSFET not switching fully at 5V |
+| Board resets when the solenoid fires | Missing flyback diode, or solenoid sharing the servo supply |
+| Solenoid clicks on power-up | Expected briefly; the sketch drives pin 7 LOW first thing in `setup()` |
 | Rig oscillates around centre | `GAIN` too high |
 | Nothing is detected at all | Camera index wrong — try `python main.py 0` |

@@ -88,20 +88,23 @@ Only one target is chased at a time. `pick_target()` locks onto the largest
 re-locking -- without that the rig oscillates between two people instead of
 centring either.
 
-## Sound
+## Solenoid
 
-`fire()` calls `play_sound()`, which shells out to the OS player -- `afplay` on
-macOS, `aplay` on Linux and the Pi -- via `Popen` so playback does not block
-detection. `SOUND_FILE` is a WAV deliberately: `aplay` plays it with no extra
-packages, where mp3 would need `mpg123` or similar installed.
+`fire()` sends `F\n` over the same serial link once a target is centred, and the
+sketch pulses pin 7 for `FIRE_MS` (400ms by default).
 
-`alert.wav` in the repo is a generated 0.3s chirp, there so this is testable
-before you pick a real sound. Replace it with any mono/stereo 16-bit WAV.
+The board owns the pulse length deliberately. If the host held the solenoid on
+and then crashed, lost USB, or was killed mid-pulse, the coil would stay
+energised and overheat. Asking for one shot and letting the board time it means
+the worst case is a single pulse, not a stuck-on coil. The sketch also drives
+pin 7 LOW in `setup()` before anything else, so a board reset cannot fire it.
 
-A missing file or missing player prints a warning and continues rather than
-raising -- losing audio should not stop the rig. Overlapping playback is not a
-concern because `COOLDOWN_SECONDS` already spaces firings further apart than any
-sensible clip.
+Pin 7 drives a MOSFET gate or relay input -- never the coil directly -- and the
+coil needs a flyback diode across it. See [HARDWARE.md](HARDWARE.md) and the
+wiring diagram for both.
+
+With no board connected, `fire()` prints `no board, solenoid not fired` and the
+vision half keeps running.
 
 ## Servo hardware
 

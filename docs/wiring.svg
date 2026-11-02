@@ -1,22 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660" width="1000" height="660" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
-  <title>Pan/tilt servo wiring diagram</title>
-  <desc>Wiring for the get-off-my-lawn pan/tilt rig: host computer to Arduino over USB, Arduino pins 9 and 10 to servo signal wires, servo power from an external 5V supply, and all grounds joined on a breadboard rail.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 860" width="1000" height="860" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title>Pan/tilt and solenoid wiring diagram</title>
+  <desc>Wiring for the get-off-my-lawn rig: host computer to Arduino over USB, pins 9 and 10 to the pan and tilt servo signal wires, pin 7 to a MOSFET gate that switches a solenoid, servo power from a 5V supply, solenoid power from its own supply with a flyback diode across the coil, and all grounds joined on a shared breadboard rail.</desc>
 
-  <rect x="0" y="0" width="1000" height="660" fill="#fbfbf9"/>
+  <rect x="0" y="0" width="1000" height="860" fill="#fbfbf9"/>
 
   <!-- ============ legend ============ -->
   <g font-size="13" fill="#44423d">
     <rect x="30" y="20" width="660" height="30" rx="6" fill="#ffffff" stroke="#ddd9d1"/>
     <line x1="46" y1="35" x2="76" y2="35" stroke="#d64545" stroke-width="4" stroke-linecap="round"/>
-    <text x="82" y="40">+5V</text>
-    <line x1="126" y1="35" x2="156" y2="35" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
-    <text x="162" y="40">ground</text>
-    <line x1="226" y1="35" x2="256" y2="35" stroke="#e08a1e" stroke-width="4" stroke-linecap="round"/>
-    <text x="262" y="40">signal (PWM)</text>
-    <line x1="366" y1="35" x2="396" y2="35" stroke="#9a968d" stroke-width="5" stroke-linecap="round"/>
-    <text x="402" y="40">USB</text>
-    <path d="M 452 42 L 452 38 C 462 34 462 26 452 22 L 452 18" fill="none" stroke="#2b2b2b" stroke-width="2.5"/>
-    <text x="466" y="40">hop = wires cross, not connected</text>
+    <text x="82" y="40">+V</text>
+    <line x1="120" y1="35" x2="150" y2="35" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+    <text x="156" y="40">ground</text>
+    <line x1="220" y1="35" x2="250" y2="35" stroke="#e08a1e" stroke-width="4" stroke-linecap="round"/>
+    <text x="256" y="40">signal</text>
+    <line x1="316" y1="35" x2="346" y2="35" stroke="#9a968d" stroke-width="5" stroke-linecap="round"/>
+    <text x="352" y="40">USB</text>
+    <path d="M 404 42 L 404 38 C 414 34 414 26 404 22 L 404 18" fill="none" stroke="#2b2b2b" stroke-width="2.5"/>
+    <text x="418" y="40">hop = wires cross, not connected</text>
   </g>
 
   <!-- ============ host computer ============ -->
@@ -27,24 +27,24 @@
     <text x="115" y="171" text-anchor="middle" font-size="12.5" fill="#6b6861">(YOLO + camera)</text>
   </g>
 
-  <!-- USB cable -->
   <line x1="200" y1="142" x2="300" y2="142" stroke="#9a968d" stroke-width="6" stroke-linecap="round"/>
   <text x="250" y="130" text-anchor="middle" font-size="12" fill="#6b6861">USB</text>
 
   <!-- ============ arduino ============ -->
   <g>
-    <rect x="300" y="90" width="220" height="200" rx="8" fill="#eef5f3" stroke="#5a8f86" stroke-width="1.5"/>
+    <rect x="300" y="90" width="220" height="230" rx="8" fill="#eef5f3" stroke="#5a8f86" stroke-width="1.5"/>
     <text x="410" y="124" text-anchor="middle" font-size="15" font-weight="600" fill="#22211e">Arduino</text>
     <text x="410" y="144" text-anchor="middle" font-size="12.5" fill="#6b6861">Uno or Nano</text>
-    <text x="410" y="258" text-anchor="middle" font-size="11.5" fill="#6b6861">powered by USB</text>
+    <text x="410" y="283" text-anchor="middle" font-size="11.5" fill="#6b6861">powered by USB</text>
 
-    <!-- pin stubs -->
     <rect x="514" y="163" width="12" height="12" fill="#5a8f86"/>
     <text x="506" y="173" text-anchor="end" font-size="12.5" fill="#44423d">pin 9</text>
     <rect x="514" y="203" width="12" height="12" fill="#5a8f86"/>
     <text x="506" y="213" text-anchor="end" font-size="12.5" fill="#44423d">pin 10</text>
-    <rect x="374" y="284" width="12" height="12" fill="#2b2b2b"/>
-    <text x="394" y="281" font-size="12.5" fill="#44423d">GND</text>
+    <rect x="294" y="243" width="12" height="12" fill="#5a8f86"/>
+    <text x="314" y="253" font-size="12.5" fill="#44423d">pin 7</text>
+    <rect x="374" y="314" width="12" height="12" fill="#2b2b2b"/>
+    <text x="394" y="311" font-size="12.5" fill="#44423d">GND</text>
   </g>
 
   <!-- ============ servos ============ -->
@@ -63,68 +63,110 @@
     <text x="890" y="174" text-anchor="middle" font-size="11.5" fill="#6b6861">brown → GND rail</text>
   </g>
 
-  <!-- ============ breadboard ============ -->
-  <rect x="280" y="400" width="700" height="150" rx="8" fill="#f2efe8" stroke="#d8d4cc" stroke-width="1.5"/>
-  <text x="292" y="422" font-size="12" fill="#8a867d">breadboard</text>
-
-  <!-- +5V rail -->
-  <rect x="300" y="444" width="660" height="12" rx="6" fill="#d64545"/>
-  <text x="300" y="438" font-size="12.5" font-weight="600" fill="#a8302f">+5V rail</text>
-  <!-- GND rail -->
-  <rect x="300" y="512" width="660" height="12" rx="6" fill="#2b2b2b"/>
-  <text x="440" y="506" font-size="12.5" font-weight="600" fill="#2b2b2b">GND rail  —  everything shares this</text>
-
-  <!-- ============ power supply ============ -->
-  <g>
-    <rect x="30" y="430" width="186" height="110" rx="8" fill="#ffffff" stroke="#c9c4ba" stroke-width="1.5"/>
-    <text x="123" y="464" text-anchor="middle" font-size="15" font-weight="600" fill="#22211e">5V supply</text>
-    <text x="123" y="486" text-anchor="middle" font-size="12.5" fill="#6b6861">2A+ (4A for MG996R)</text>
-    <text x="123" y="508" text-anchor="middle" font-size="11.5" fill="#a8302f">separate from Arduino</text>
-    <rect x="210" y="474" width="12" height="10" fill="#d64545"/>
-    <rect x="210" y="518" width="12" height="10" fill="#2b2b2b"/>
-  </g>
-
-  <!-- supply +5V -> red rail -->
-  <path d="M 222 479 L 258 479 L 258 450 L 300 450" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- supply GND -> gnd rail -->
-  <path d="M 222 523 L 262 523 L 262 518 L 300 518" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <!-- ============ signal wires ============ -->
-  <!-- pin 9 -> pan signal -->
+  <!-- signal wires to servos -->
   <path d="M 526 169 L 562 169 L 562 112 L 600 112" fill="none" stroke="#e08a1e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- pin 10 -> tilt signal, routed above the pan servo -->
   <path d="M 526 209 L 578 209 L 578 66 L 886 66 L 886 86" fill="none" stroke="#e08a1e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- ============ power wires to rails ============ -->
-  <!-- pan servo red -> +5V rail -->
-  <path d="M 648 198 L 648 450" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round"/>
-  <!-- tilt servo red -> +5V rail -->
-  <path d="M 858 198 L 858 450" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- ============ solenoid branch (left column) ============ -->
+  <g>
+    <rect x="30" y="225" width="150" height="70" rx="8" fill="#f4f1fa" stroke="#6f66a8" stroke-width="1.5"/>
+    <text x="105" y="251" text-anchor="middle" font-size="14" font-weight="600" fill="#22211e">MOSFET</text>
+    <text x="105" y="269" text-anchor="middle" font-size="11.5" fill="#6b6861">logic-level N-ch</text>
+    <text x="105" y="286" text-anchor="middle" font-size="11.5" fill="#6b6861">IRLZ44N, or a relay</text>
+  </g>
+  <g>
+    <rect x="30" y="315" width="150" height="70" rx="8" fill="#ffffff" stroke="#c9c4ba" stroke-width="1.5"/>
+    <text x="105" y="341" text-anchor="middle" font-size="15" font-weight="600" fill="#22211e">Solenoid</text>
+    <text x="105" y="361" text-anchor="middle" font-size="11.5" fill="#6b6861">valve or striker</text>
+    <text x="105" y="378" text-anchor="middle" font-size="11.5" fill="#6b6861">coil — no polarity</text>
+  </g>
+  <g>
+    <rect x="30" y="405" width="150" height="70" rx="8" fill="#ffffff" stroke="#c9c4ba" stroke-width="1.5"/>
+    <text x="105" y="431" text-anchor="middle" font-size="14" font-weight="600" fill="#22211e">Solenoid supply</text>
+    <text x="105" y="449" text-anchor="middle" font-size="11.5" fill="#6b6861">its own 12V or 5V</text>
+    <text x="105" y="466" text-anchor="middle" font-size="11.5" fill="#6b6861">— match your coil</text>
+  </g>
 
-  <!-- pan servo ground -> GND rail, hopping over the +5V rail (no connection) -->
-  <path d="M 706 198 L 706 436 C 724 442 724 458 706 464 L 706 518" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
-  <!-- tilt servo ground -> GND rail, hopping over the +5V rail -->
-  <path d="M 916 198 L 916 436 C 934 442 934 458 916 464 L 916 518" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
-  <!-- arduino GND -> GND rail, hopping over the +5V rail -->
-  <path d="M 380 296 L 380 436 C 398 442 398 458 380 464 L 380 518" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- pin 7 -> MOSFET gate -->
+  <path d="M 294 249 L 240 249 L 240 262 L 180 262" fill="none" stroke="#e08a1e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="212" y="242" text-anchor="middle" font-size="11" fill="#8a867d">gate</text>
 
-  <!-- junction dots where wires actually join a rail -->
+  <!-- MOSFET drain -> coil, coil -> supply + -->
+  <path d="M 105 295 L 105 315" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 105 385 L 105 405" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- flyback diode in parallel with the coil; band (cathode) toward +V -->
+  <g>
+    <path d="M 105 305 L 240 305 L 240 395 L 105 395" fill="none" stroke="#5a5f8f" stroke-width="2.5" stroke-linejoin="round"/>
+    <polygon points="233,337 247,337 240,351" fill="#5a5f8f"/>
+    <line x1="231" y1="353" x2="249" y2="353" stroke="#5a5f8f" stroke-width="3"/>
+    <circle cx="105" cy="305" r="4.5" fill="#5a5f8f"/>
+    <circle cx="105" cy="395" r="4.5" fill="#5a5f8f"/>
+    <text x="215" y="425" font-size="11.5" fill="#5a5f8f">flyback diode</text>
+    <text x="215" y="442" font-size="11.5" fill="#5a5f8f">1N4007, band to +V</text>
+  </g>
+
+  <!-- MOSFET source and supply minus share a ground run to the rail -->
+  <path d="M 180 282 L 200 282 L 200 455 L 180 455" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 200 390 L 345 390 L 345 514 C 363 520 363 536 345 542 L 345 596" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="200" cy="390" r="5" fill="#000000"/>
+
+  <!-- ============ breadboard ============ -->
+  <rect x="280" y="478" width="700" height="150" rx="8" fill="#f2efe8" stroke="#d8d4cc" stroke-width="1.5"/>
+  <text x="292" y="620" font-size="12" fill="#8a867d">breadboard</text>
+
+  <rect x="300" y="522" width="660" height="12" rx="6" fill="#d64545"/>
+  <text x="404" y="516" font-size="12.5" font-weight="600" fill="#a8302f">+5V rail  (servos only)</text>
+  <rect x="300" y="590" width="660" height="12" rx="6" fill="#2b2b2b"/>
+  <text x="432" y="584" font-size="12.5" font-weight="600" fill="#2b2b2b">GND rail  —  every ground meets here</text>
+
+  <!-- ============ servo 5V supply ============ -->
+  <g>
+    <rect x="30" y="508" width="186" height="110" rx="8" fill="#ffffff" stroke="#c9c4ba" stroke-width="1.5"/>
+    <text x="123" y="542" text-anchor="middle" font-size="15" font-weight="600" fill="#22211e">5V supply</text>
+    <text x="123" y="564" text-anchor="middle" font-size="12.5" fill="#6b6861">2A+ (4A for MG996R)</text>
+    <text x="123" y="586" text-anchor="middle" font-size="11.5" fill="#a8302f">separate from Arduino</text>
+    <rect x="210" y="552" width="12" height="10" fill="#d64545"/>
+    <rect x="210" y="596" width="12" height="10" fill="#2b2b2b"/>
+  </g>
+  <path d="M 222 557 L 258 557 L 258 528 L 300 528" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 222 601 L 262 601 L 262 596 L 300 596" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ============ servo power wires ============ -->
+  <path d="M 648 198 L 648 528" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 858 198 L 858 528" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 706 198 L 706 514 C 724 520 724 536 706 542 L 706 596" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 916 198 L 916 514 C 934 520 934 536 916 542 L 916 596" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 380 326 L 380 514 C 398 520 398 536 380 542 L 380 596" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- junction dots -->
   <g fill="#8c1f1f">
-    <circle cx="648" cy="450" r="5"/>
-    <circle cx="858" cy="450" r="5"/>
-    <circle cx="300" cy="450" r="5"/>
+    <circle cx="648" cy="528" r="5"/>
+    <circle cx="858" cy="528" r="5"/>
+    <circle cx="300" cy="528" r="5"/>
   </g>
   <g fill="#000000">
-    <circle cx="706" cy="518" r="5"/>
-    <circle cx="916" cy="518" r="5"/>
-    <circle cx="380" cy="518" r="5"/>
-    <circle cx="300" cy="518" r="5"/>
+    <circle cx="706" cy="596" r="5"/>
+    <circle cx="916" cy="596" r="5"/>
+    <circle cx="380" cy="596" r="5"/>
+    <circle cx="300" cy="596" r="5"/>
+    <circle cx="345" cy="596" r="5"/>
   </g>
 
-  <!-- ============ warning ============ -->
+  <!-- ============ warnings ============ -->
   <g>
-    <rect x="30" y="586" width="940" height="52" rx="8" fill="#fdf3f1" stroke="#e0a9a3" stroke-width="1.5"/>
-    <text x="50" y="609" font-size="13" font-weight="600" fill="#8c1f1f">Never connect the 5V supply to the Arduino’s 5V pin.</text>
-    <text x="50" y="628" font-size="12.5" fill="#6b4340">Only the grounds are shared. The Arduino is powered by USB, the servos by the supply. Back-feeding the 5V pin can damage the board.</text>
+    <rect x="30" y="660" width="940" height="52" rx="8" fill="#fdf3f1" stroke="#e0a9a3" stroke-width="1.5"/>
+    <text x="50" y="683" font-size="13" font-weight="600" fill="#8c1f1f">Never wire the solenoid straight to pin 7.</text>
+    <text x="50" y="702" font-size="12.5" fill="#6b4340">A coil draws far more current than a pin can supply. Pin 7 switches a MOSFET gate or relay input; that part switches the coil.</text>
+  </g>
+  <g>
+    <rect x="30" y="724" width="940" height="52" rx="8" fill="#fdf3f1" stroke="#e0a9a3" stroke-width="1.5"/>
+    <text x="50" y="747" font-size="13" font-weight="600" fill="#8c1f1f">The flyback diode is not optional.</text>
+    <text x="50" y="766" font-size="12.5" fill="#6b4340">Switching a coil off produces a large reverse voltage spike. Without a diode across the coil, that spike destroys the MOSFET.</text>
+  </g>
+  <g>
+    <rect x="30" y="788" width="940" height="52" rx="8" fill="#fdf3f1" stroke="#e0a9a3" stroke-width="1.5"/>
+    <text x="50" y="811" font-size="13" font-weight="600" fill="#8c1f1f">Neither supply’s + goes to the Arduino’s 5V pin.</text>
+    <text x="50" y="830" font-size="12.5" fill="#6b4340">Only grounds are shared: Arduino, servo supply and solenoid supply all meet on the GND rail. The Arduino is powered by USB.</text>
   </g>
 </svg>
