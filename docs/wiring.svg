@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 860" width="1000" height="860" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 924" width="1000" height="924" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
   <title>Pan/tilt and solenoid wiring diagram</title>
-  <desc>Wiring for the get-off-my-lawn rig: host computer to Arduino over USB, pins 9 and 10 to the pan and tilt servo signal wires, pin 7 to a MOSFET gate that switches a solenoid, servo power from a 5V supply, solenoid power from its own supply with a flyback diode across the coil, and all grounds joined on a shared breadboard rail.</desc>
+  <desc>Wiring for the get-off-my-lawn rig: host computer to Arduino over USB, pins 9 and 10 to the pan and tilt servo signal wires, pin 7 through a 220 ohm resistor to the gate of a MOSFET that switches a 12V 1.7A solenoid, a 10k ohm resistor from gate to source, servo power from a 5V supply, solenoid power from its own 12V supply with a flyback diode across the coil, and all grounds joined on a shared breadboard rail.</desc>
 
-  <rect x="0" y="0" width="1000" height="860" fill="#fbfbf9"/>
+  <rect x="0" y="0" width="1000" height="924" fill="#fbfbf9"/>
 
   <!-- ============ legend ============ -->
   <g font-size="13" fill="#44423d">
-    <rect x="30" y="20" width="660" height="30" rx="6" fill="#ffffff" stroke="#ddd9d1"/>
+    <rect x="30" y="20" width="940" height="30" rx="6" fill="#ffffff" stroke="#ddd9d1"/>
     <line x1="46" y1="35" x2="76" y2="35" stroke="#d64545" stroke-width="4" stroke-linecap="round"/>
     <text x="82" y="40">+V</text>
     <line x1="120" y1="35" x2="150" y2="35" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
@@ -17,6 +17,8 @@
     <text x="352" y="40">USB</text>
     <path d="M 404 42 L 404 38 C 414 34 414 26 404 22 L 404 18" fill="none" stroke="#2b2b2b" stroke-width="2.5"/>
     <text x="418" y="40">hop = wires cross, not connected</text>
+    <line x1="650" y1="35" x2="680" y2="35" stroke="#7a3fa0" stroke-width="4" stroke-linecap="round"/>
+    <text x="686" y="40">coil to drain: +12V when idle, not ground</text>
   </g>
 
   <!-- ============ host computer ============ -->
@@ -68,48 +70,64 @@
   <path d="M 526 209 L 578 209 L 578 66 L 886 66 L 886 86" fill="none" stroke="#e08a1e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- ============ solenoid branch (left column) ============ -->
+  <rect x="18" y="204" width="270" height="268" rx="8" fill="none" stroke="#9a968d" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="30" y="220" font-size="11.5" font-weight="600" fill="#6b6861">Heavy wiring: solder or screw terminals</text>
+
   <g>
-    <rect x="30" y="225" width="150" height="70" rx="8" fill="#f4f1fa" stroke="#6f66a8" stroke-width="1.5"/>
-    <text x="105" y="251" text-anchor="middle" font-size="14" font-weight="600" fill="#22211e">MOSFET</text>
-    <text x="105" y="269" text-anchor="middle" font-size="11.5" fill="#6b6861">logic-level N-ch</text>
-    <text x="105" y="286" text-anchor="middle" font-size="11.5" fill="#6b6861">IRLZ44N, or a relay</text>
+    <rect x="30" y="228" width="130" height="68" rx="8" fill="#f4f1fa" stroke="#6f66a8" stroke-width="1.5"/>
+    <text x="95" y="250" text-anchor="middle" font-size="14" font-weight="600" fill="#22211e">MOSFET</text>
+    <text x="95" y="267" text-anchor="middle" font-size="11.5" fill="#6b6861">logic-level N-ch</text>
+    <text x="95" y="283" text-anchor="middle" font-size="11.5" fill="#6b6861">IRLZ44N</text>
   </g>
   <g>
-    <rect x="30" y="315" width="150" height="70" rx="8" fill="#ffffff" stroke="#c9c4ba" stroke-width="1.5"/>
-    <text x="105" y="341" text-anchor="middle" font-size="15" font-weight="600" fill="#22211e">Solenoid</text>
-    <text x="105" y="361" text-anchor="middle" font-size="11.5" fill="#6b6861">valve or striker</text>
-    <text x="105" y="378" text-anchor="middle" font-size="11.5" fill="#6b6861">coil — no polarity</text>
+    <rect x="30" y="315" width="130" height="70" rx="8" fill="#ffffff" stroke="#c9c4ba" stroke-width="1.5"/>
+    <text x="95" y="341" text-anchor="middle" font-size="15" font-weight="600" fill="#22211e">Solenoid</text>
+    <text x="95" y="361" text-anchor="middle" font-size="11.5" fill="#6b6861">12V, 1.7A</text>
+    <text x="95" y="378" text-anchor="middle" font-size="11.5" fill="#6b6861">coil — no polarity</text>
   </g>
   <g>
-    <rect x="30" y="405" width="150" height="70" rx="8" fill="#ffffff" stroke="#c9c4ba" stroke-width="1.5"/>
-    <text x="105" y="431" text-anchor="middle" font-size="14" font-weight="600" fill="#22211e">Solenoid supply</text>
-    <text x="105" y="449" text-anchor="middle" font-size="11.5" fill="#6b6861">its own 12V or 5V</text>
-    <text x="105" y="466" text-anchor="middle" font-size="11.5" fill="#6b6861">— match your coil</text>
+    <rect x="30" y="405" width="130" height="60" rx="8" fill="#ffffff" stroke="#c9c4ba" stroke-width="1.5"/>
+    <text x="95" y="426" text-anchor="middle" font-size="14" font-weight="600" fill="#22211e">Solenoid supply</text>
+    <text x="95" y="443" text-anchor="middle" font-size="11.5" fill="#6b6861">12V, 3A or more</text>
+    <text x="95" y="458" text-anchor="middle" font-size="11.5" fill="#6b6861">not the servo supply</text>
   </g>
 
-  <!-- pin 7 -> MOSFET gate -->
-  <path d="M 294 249 L 240 249 L 240 262 L 180 262" fill="none" stroke="#e08a1e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="212" y="242" text-anchor="middle" font-size="11" fill="#8a867d">gate</text>
+  <!-- pin 7 -> 220 ohm -> MOSFET gate -->
+  <path d="M 294 249 L 160 249" fill="none" stroke="#e08a1e" stroke-width="3.5" stroke-linecap="round"/>
+  <rect x="248" y="243" width="28" height="12" rx="2" fill="#ffffff" stroke="#44423d" stroke-width="1.5"/>
+  <text x="262" y="238" text-anchor="middle" font-size="11" fill="#44423d">220Ω</text>
+  <text x="172" y="243" font-size="11" fill="#8a867d">gate</text>
 
-  <!-- MOSFET drain -> coil, coil -> supply + -->
-  <path d="M 105 295 L 105 315" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
-  <path d="M 105 385 L 105 405" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- 10k ohm from gate to source -->
+  <path d="M 222 249 L 222 282" fill="none" stroke="#44423d" stroke-width="2"/>
+  <rect x="216" y="255" width="12" height="21" rx="2" fill="#ffffff" stroke="#44423d" stroke-width="1.5"/>
+  <text x="233" y="270" font-size="11" fill="#44423d">10kΩ</text>
+  <circle cx="222" cy="249" r="4.5" fill="#e08a1e"/>
+
+  <!-- heavy loop: supply + -> coil -> drain, source -> supply - -->
+  <path d="M 95 296 L 95 315" fill="none" stroke="#7a3fa0" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 95 385 L 95 405" fill="none" stroke="#d64545" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 160 282 L 278 282 L 278 435 L 160 435" fill="none" stroke="#2b2b2b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="222" cy="282" r="5" fill="#000000"/>
+  <text x="172" y="276" font-size="11" fill="#8a867d">source</text>
+  <text x="84" y="309" text-anchor="end" font-size="11" fill="#8a867d">drain</text>
 
   <!-- flyback diode in parallel with the coil; band (cathode) toward +V -->
   <g>
-    <path d="M 105 305 L 240 305 L 240 395 L 105 395" fill="none" stroke="#5a5f8f" stroke-width="2.5" stroke-linejoin="round"/>
-    <polygon points="233,337 247,337 240,351" fill="#5a5f8f"/>
-    <line x1="231" y1="353" x2="249" y2="353" stroke="#5a5f8f" stroke-width="3"/>
-    <circle cx="105" cy="305" r="4.5" fill="#5a5f8f"/>
-    <circle cx="105" cy="395" r="4.5" fill="#5a5f8f"/>
-    <text x="215" y="425" font-size="11.5" fill="#5a5f8f">flyback diode</text>
-    <text x="215" y="442" font-size="11.5" fill="#5a5f8f">1N4007, band to +V</text>
+    <path d="M 95 305 L 250 305 L 250 395 L 95 395" fill="none" stroke="#5a5f8f" stroke-width="2.5" stroke-linejoin="round"/>
+    <polygon points="243,337 257,337 250,351" fill="#5a5f8f"/>
+    <line x1="241" y1="353" x2="259" y2="353" stroke="#5a5f8f" stroke-width="3"/>
+    <circle cx="95" cy="305" r="4.5" fill="#5a5f8f"/>
+    <circle cx="95" cy="395" r="4.5" fill="#5a5f8f"/>
+    <text x="202" y="333" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5a5f8f">flyback</text>
+    <text x="202" y="348" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5a5f8f">diode</text>
+    <text x="202" y="364" text-anchor="middle" font-size="11.5" fill="#5a5f8f">1N5408</text>
+    <text x="202" y="379" text-anchor="middle" font-size="11.5" fill="#5a5f8f">band to +12V</text>
   </g>
 
-  <!-- MOSFET source and supply minus share a ground run to the rail -->
-  <path d="M 180 282 L 200 282 L 200 455 L 180 455" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 200 390 L 345 390 L 345 514 C 363 520 363 536 345 542 L 345 596" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="200" cy="390" r="5" fill="#000000"/>
+  <!-- one thin ground wire ties the heavy loop to the rail -->
+  <circle cx="278" cy="420" r="5" fill="#000000"/>
+  <text x="294" y="412" font-size="11" fill="#8a867d">thin wire</text>
 
   <!-- ============ breadboard ============ -->
   <rect x="280" y="478" width="700" height="150" rx="8" fill="#f2efe8" stroke="#d8d4cc" stroke-width="1.5"/>
@@ -131,6 +149,9 @@
   </g>
   <path d="M 222 557 L 258 557 L 258 528 L 300 528" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M 222 601 L 262 601 L 262 596 L 300 596" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- solenoid loop's thin ground wire, drawn over the breadboard -->
+  <path d="M 278 420 L 345 420 L 345 514 C 363 520 363 536 345 542 L 345 596" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- ============ servo power wires ============ -->
   <path d="M 648 198 L 648 528" fill="none" stroke="#d64545" stroke-width="3.5" stroke-linecap="round"/>
@@ -157,7 +178,7 @@
   <g>
     <rect x="30" y="660" width="940" height="52" rx="8" fill="#fdf3f1" stroke="#e0a9a3" stroke-width="1.5"/>
     <text x="50" y="683" font-size="13" font-weight="600" fill="#8c1f1f">Never wire the solenoid straight to pin 7.</text>
-    <text x="50" y="702" font-size="12.5" fill="#6b4340">A coil draws far more current than a pin can supply. Pin 7 switches a MOSFET gate or relay input; that part switches the coil.</text>
+    <text x="50" y="702" font-size="12.5" fill="#6b4340">Pin 7 only switches the MOSFET. The 10kΩ resistor holds the MOSFET off while the pin floats during a reset or with the board unpowered.</text>
   </g>
   <g>
     <rect x="30" y="724" width="940" height="52" rx="8" fill="#fdf3f1" stroke="#e0a9a3" stroke-width="1.5"/>
@@ -168,5 +189,10 @@
     <rect x="30" y="788" width="940" height="52" rx="8" fill="#fdf3f1" stroke="#e0a9a3" stroke-width="1.5"/>
     <text x="50" y="811" font-size="13" font-weight="600" fill="#8c1f1f">Neither supply’s + goes to the Arduino’s 5V pin.</text>
     <text x="50" y="830" font-size="12.5" fill="#6b4340">Only grounds are shared: Arduino, servo supply and solenoid supply all meet on the GND rail. The Arduino is powered by USB.</text>
+  </g>
+  <g>
+    <rect x="30" y="852" width="940" height="52" rx="8" fill="#fdf3f1" stroke="#e0a9a3" stroke-width="1.5"/>
+    <text x="50" y="875" font-size="13" font-weight="600" fill="#8c1f1f">Keep the solenoid's current off the breadboard.</text>
+    <text x="50" y="894" font-size="12.5" fill="#6b4340">It draws 1.7A and a breadboard manages about 1A. Use 18–20 AWG wire for the thick lines, with one thin ground wire to the GND rail.</text>
   </g>
 </svg>
