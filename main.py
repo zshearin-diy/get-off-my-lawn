@@ -36,6 +36,8 @@ PAN_SIGN, TILT_SIGN = 1, 1   # flip to -1 if the rig steers away from the target
 GAIN = 0.6               # fraction of the error corrected per update; <1 damps overshoot
 MAX_STEP = 10.0          # degrees per update, so one bad frame cannot slam the rig
 DEADZONE = 0.05          # |error| under this counts as centred
+SETTLE_SECONDS = 0.5     # after a move, ignore frames this long: the servo is still
+                         # travelling and earlier frames show the old aim (overshoot)
 CENTERED_FRAMES = 3      # consecutive centred frames before firing
 COOLDOWN_SECONDS = 10    # minimum gap between firings
 LOST_FRAMES = 10         # frames without the locked target before re-locking
@@ -52,6 +54,7 @@ rig = {
     "missing": 0,        # consecutive frames the locked target was absent
     "centered": 0,       # consecutive frames the target has been centred
     "fired_at": None,    # time.monotonic() of the last firing
+    "moved_at": None,    # time.monotonic() of the last steer command
 }
 
 
@@ -140,6 +143,7 @@ def steer(error_x, error_y):
     rig["pan"] = clamp(rig["pan"] + pan_delta, PAN_LIMITS)
     rig["tilt"] = clamp(rig["tilt"] + tilt_delta, TILT_LIMITS)
     send_angles(int(round(rig["pan"])), int(round(rig["tilt"])), pan_delta, tilt_delta)
+    rig["moved_at"] = time.monotonic()
 
 
 def pick_target(targets):
@@ -165,10 +169,16 @@ def pick_target(targets):
 
 
 def evaluate(targets, now):
-    """Steer toward the locked target, and fire once it is centred."""
+    """Steer toward the locked target, and fire once it is centred.
+
+    `now` is when the frame was captured, not when inference finished, so a
+    frame taken while the rig was still moving is recognised as stale.
+    """
     object_id = pick_target(targets)
     if object_id is None:
         return
+    if rig["moved_at"] is not None and now - rig["moved_at"] < SETTLE_SECONDS:
+        return  # this frame predates the last move settling; acting on it overshoots
 
     center_x, center_y = float(targets[object_id][0]), float(targets[object_id][1])
     error_x, error_y = center_x - 0.5, center_y - 0.5
@@ -204,24 +214,26 @@ if not target_ids:
 
 
 def frames(capture):
-    """Camera frames, flipped upright.
+    """(frame, capture time) pairs, frames flipped upright.
 
     The camera is read here rather than handed to model.track as a source, so
     each frame can be flipped before the model sees it.
     """
     while True:
         ok, frame = capture.read()
+        captured_at = time.monotonic()
         if not ok:
             return
-        yield frame if FLIP is None else cv2.flip(frame, FLIP)
+        yield (frame if FLIP is None else cv2.flip(frame, FLIP)), captured_at
 
 
 capture = cv2.VideoCapture(camera)
+capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # newest frame only; queued ones show the old aim
 if not capture.isOpened():
     raise SystemExit(f"Cannot open camera {camera}")
 
 writer = None  # created on the first frame, once its size is known
-for frame in frames(capture):
+for frame, captured_at in frames(capture):
     # persist=True keeps tracker IDs across calls now that frames arrive one at a time
     r = model.track(frame, classes=target_ids, persist=True, verbose=False)[0]
 
@@ -252,7 +264,7 @@ for frame in frames(capture):
         if float(box.conf) >= MIN_CONFIDENCE:  # classes already filtered by the model
             targets[object_id] = box.xywhn[0]
 
-    evaluate(targets, time.monotonic())
+    evaluate(targets, captured_at)
 
     if VERBOSE:
         for key, value in center_map.items():
