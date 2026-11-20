@@ -38,11 +38,11 @@ const int HOME_ANGLE = 90;
 // ---- Motor tuning: the only values that depend on which servos are fitted ----
 // Sweep speed. Must stay BELOW the servo's speed under load, or the commanded
 // angle runs ahead of the shaft and "moved" is reported early. MG996R is about
-// 0.17s/60deg (~350 deg/s) unloaded at 5V; 120 leaves margin for the camera.
-const float DEG_PER_SEC = 120.0;
+// 0.17s/60deg (~350 deg/s) unloaded at 5V; 220 leaves margin for the camera.
+const float DEG_PER_SEC = 220.0;
 // Pause after the sweep for the shaft to stop and the rig to stop wobbling,
 // so the next camera frame is sharp and shows the final aim.
-const unsigned long SETTLE_MS = 150;
+const unsigned long SETTLE_MS = 100;
 // -----------------------------------------------------------------------------
 
 // How long one shot lasts. The board times this itself so a host crash or an

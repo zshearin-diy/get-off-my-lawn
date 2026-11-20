@@ -289,7 +289,7 @@ Double the angle you travelled, and that's the horizontal figure. Repeat
 vertically for tilt.
 
 **`GAIN`** — how much of the remaining error is corrected per update. Start at
-`0.6`. Lower it if the rig overshoots and oscillates around centre; raise it if
+`0.9`. Lower it if the rig overshoots and oscillates around centre; raise it if
 it creeps toward the target too slowly.
 
 ---

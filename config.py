@@ -33,13 +33,13 @@ PAN_SIGN, TILT_SIGN = 1, -1   # flip to -1 if the rig steers away from the targe
 # Fraction of the error corrected per move. Every move is measured from a frame
 # taken after the rig settled, so this can sit near 1; lower it only if a
 # mis-measured FOV makes the rig overshoot.
-GAIN = 0.6
-MAX_STEP = 10.0          # degrees per move, so one bad detection cannot slam the rig
+GAIN = 0.9
+MAX_STEP = 30.0          # degrees per move, so one bad detection cannot slam the rig
 DEADZONE = 0.05          # |error| under this counts as centred
 
 # --- Firing -------------------------------------------------------------------
 
-CENTERED_FRAMES = 3      # consecutive centred frames before firing
+CENTERED_FRAMES = 2      # consecutive centred frames before firing
 COOLDOWN_SECONDS = 10    # minimum gap between firings
 LOST_FRAMES = 10         # frames without the locked target before re-locking
 

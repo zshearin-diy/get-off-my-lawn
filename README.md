@@ -91,7 +91,7 @@ Three things need calibrating on the real hardware:
 - `PAN_SIGN` / `TILT_SIGN` -- flip to `-1` if the rig steers *away* from the
   target. Which sign is correct depends on how the servos are mounted.
 - `GAIN` -- raise for faster convergence (each move starts from a settled frame,
-  so 0.8-1.0 is reasonable), lower if the rig overshoots. Start at 0.6.
+  so 0.8-1.0 is reasonable), lower if the rig overshoots. Start at 0.9.
 
 `DEADZONE` is what stops the rig hunting forever: inside it the target counts as
 centred, so a small residual offset (a couple of degrees) is expected and
