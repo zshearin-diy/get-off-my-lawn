@@ -78,14 +78,15 @@ This proves the board works before Python is anywhere near it.
    Ending" selected, nothing you type will ever do anything.
 4. Type `P120T060` and press Enter, then type `F` and press Enter.
 
-The board should reply:
+The board should reply (each reply arrives once the action has *finished*, so
+the first takes a moment):
 
 ```
-ok 120 60
-ok fire
+moved 120 60
+fired
 ```
 
-**Checkpoint:** you get `ok` back. If you do, the board, cable, port, baud rate
+**Checkpoint:** you get both replies back. If you do, the board, cable, port, baud rate
 and command format are all confirmed working. Servos still aren't connected, so
 nothing moves.
 
@@ -217,8 +218,9 @@ the new solenoid needs a longer pulse, change `FIRE_MS` in the sketch.
 4. Type `P120T060` and press Enter.
 5. Type `F` and press Enter.
 
-Both servos should move (`ok 120 60`), and the solenoid should click for about
-400ms and release on its own (`ok fire`).
+Both servos should sweep smoothly and the board should reply `moved 120 60` once
+they stop. The solenoid should click for about 400ms and release on its own
+(`fired`).
 
 > **If the solenoid stays energised**, stop and unplug it. The board releases it
 > on a timer, so a stuck coil usually means the MOSFET's pins are wired wrong or
@@ -257,10 +259,10 @@ Look for this line at startup:
 [board]   connected on /dev/cu.usbmodem1101
 ```
 
-If instead you see `[board] no serial port found, printing angles only`, the
+If instead you see `[board] no serial port found, printing commands only`, the
 program is running fine but talking to nobody — check the USB cable and that the
-Serial Monitor is closed. You can also set `SERIAL_PORT` near the top of
-`main.py` to the exact port instead of relying on autodetection.
+Serial Monitor is closed. You can also set `SERIAL_PORT` in
+`config.py` to the exact port instead of relying on autodetection.
 
 As a person is detected, you'll see the rig steering:
 
@@ -274,7 +276,7 @@ and the same values go to the servos as `P100T095`.
 
 ## Stage 7 — Calibrate
 
-Three values in `main.py` are placeholders until measured on your actual rig.
+Three values in `config.py` are placeholders until measured on your actual rig.
 
 **`PAN_SIGN` / `TILT_SIGN`** — if the rig turns *away* from the target and runs
 to its limit, flip the relevant one from `1` to `-1`. Which is correct depends
@@ -297,7 +299,7 @@ it creeps toward the target too slowly.
 - **Don't force the servo horn by hand** while it's powered. You're fighting the
   motor and can strip the gears.
 - **Respect the limits.** Cheap servos don't truly reach 0–180°; if yours buzzes
-  and strains at an extreme, narrow `PAN_LIMITS` / `TILT_LIMITS` in `main.py`.
+  and strains at an extreme, narrow `PAN_LIMITS` / `TILT_LIMITS` in `config.py`.
 - **Servos twitch on power-up.** Normal. Don't mount anything fragile where a
   sudden jump would break it.
 - **Uploading while servos are powered** can cause a jerk as the board resets.
