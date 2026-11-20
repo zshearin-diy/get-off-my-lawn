@@ -9,7 +9,7 @@ CAMERA_INDEX = 1
 # cv2.flip code applied to every frame before detection, so the steering maths
 # sees an upright image: -1 rotates 180 (camera mounted upside down), 0 flips
 # vertically, 1 mirrors left-right, None leaves frames untouched.
-FLIP = -1
+FLIP = 1
 
 # --- Detection ----------------------------------------------------------------
 
@@ -29,7 +29,7 @@ PAN_LIMITS, TILT_LIMITS = (0, 180), (0, 180)
 # until it sits at the frame edge, and double the angle you travelled.
 FOV_PAN_DEG, FOV_TILT_DEG = 60.0, 45.0
 
-PAN_SIGN, TILT_SIGN = 1, 1   # flip to -1 if the rig steers away from the target
+PAN_SIGN, TILT_SIGN = 1, -1   # flip to -1 if the rig steers away from the target
 # Fraction of the error corrected per move. Every move is measured from a frame
 # taken after the rig settled, so this can sit near 1; lower it only if a
 # mis-measured FOV makes the rig overshoot.
